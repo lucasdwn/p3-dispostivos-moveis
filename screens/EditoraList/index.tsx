@@ -5,18 +5,29 @@ import booksData from '../../assets/books.json';
 import { RootStackParamList } from 'App';
 import { styles } from './style';
 import { Book } from 'interfaces/IBook';
+import { RouteProp } from '@react-navigation/native';
 
-type BookListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'Books'>;
+type EditoraListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'EditoraList'>;
+type EditoraListScreenRouteProp = RouteProp<RootStackParamList, 'EditoraList'>;
 
 type Props = {
-    navigation: BookListScreenNavigationProp;
+    navigation: EditoraListScreenNavigationProp;
+    route: EditoraListScreenRouteProp
 };
 
-export default function BookListScreen({ navigation }: Props) {
+export default function EditoraListScreen({ navigation, route }: Props) {
+    const { editora } = route.params;
     const [books, setBooks] = useState<Book[]>([]);
 
     useEffect(() => {
-        setBooks(booksData);
+        const booksEditora = booksData.filter((i) => i.publisher === editora)
+
+        const uniqueBooks = new Map(
+            booksEditora.map(i => [i.title, i])
+        )
+        setBooks(
+            [...uniqueBooks.values()]
+        );
     }, []);
 
     return (
@@ -28,11 +39,7 @@ export default function BookListScreen({ navigation }: Props) {
                     <View style={styles.bookItem}>
                         <Text style={styles.title}>{item.title}</Text>
                         <Text>{item.author}</Text>
-                        <TouchableOpacity
-                            onPress={() => navigation.navigate('EditoraList', { editora: item.publisher })}
-                        >
-                            <Text style={{ color: 'blue' }}>{item.publisher}</Text>
-                        </TouchableOpacity>
+                        <Text>{item.publisher}</Text>
                         <Text>{item.year}</Text>
                     </View>
                 )}
